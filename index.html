@@ -1,0 +1,308 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Simulador Agrinho 2026 - AgroForte e Sustentável</title>
+    <style>
+        /* Estilização Geral (CSS) */
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #eef5ed;
+            color: #333;
+            margin: 0;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        header {
+            text-align: center;
+            margin-bottom: 20px;
+        }
+
+        h1 { color: #2e7d32; margin-bottom: 5px; }
+        h3 { color: #558b2f; margin-top: 0; }
+
+        .container {
+            display: flex;
+            gap: 20px;
+            max-width: 900px;
+            width: 100%;
+        }
+
+        .painel {
+            background: white;
+            padding: 20px;
+            border-radius: 12px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+            flex: 1;
+        }
+
+        .status-item {
+            margin-bottom: 15px;
+            font-size: 1.1em;
+        }
+
+        .barra {
+            background-color: #ddd;
+            border-radius: 8px;
+            height: 20px;
+            width: 100%;
+            overflow: hidden;
+            margin-top: 5px;
+        }
+
+        .progresso {
+            height: 100%;
+            width: 50%;
+            transition: width 0.5s, background-color 0.5s;
+        }
+
+        #agua-barra { background-color: #2196F3; }
+        #saude-barra { background-color: #4CAF50; }
+        #sustentavel-barra { background-color: #8bc34a; }
+
+        .controles {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 10px;
+            margin-top: 20px;
+        }
+
+        button {
+            padding: 12px;
+            border: none;
+            border-radius: 8px;
+            font-size: 1em;
+            cursor: pointer;
+            font-weight: bold;
+            transition: transform 0.1s, opacity 0.2s;
+        }
+
+        button:active { transform: scale(0.98); }
+        
+        .btn-agua { background-color: #2196F3; color: white; }
+        .btn-bio { background-color: #4CAF50; color: white; }
+        .btn-quimico { background-color: #ff9800; color: white; }
+        .btn-colher { background-color: #9c27b0; color: white; grid-column: span 2; }
+        button:disabled { background-color: #ccc; cursor: not-allowed; }
+
+        .visual-planta {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            min-height: 250px;
+            border: 2px dashed #a5d6a7;
+            border-radius: 12px;
+            background-color: #f9fbf9;
+        }
+
+        #icone-planta { font-size: 80px; transition: transform 0.3s; }
+        #alerta-praga { color: #d32f2f; font-weight: bold; margin-top: 10px; min-height: 20px; }
+
+        .log-mensagens {
+            margin-top: 15px;
+            padding: 10px;
+            background: #f1f1f1;
+            border-radius: 6px;
+            font-size: 0.9em;
+            max-height: 80px;
+            overflow-y: auto;
+        }
+    </style>
+</head>
+<body>
+
+    <header>
+        <h1>Simulador AgroForte 2026</h1>
+        <h3>Equilíbrio entre Produção e Meio Ambiente</h3>
+    </header>
+
+    <div class="container">
+        <div class="painel">
+            <h2>Status da Plantação</h2>
+            
+            <div class="status-item">
+                💧 Umidade do Solo: <span id="txt-agua">50</span>%
+                <div class="barra"><div id="agua-barra" class="progresso" style="width: 50%;"></div></div>
+            </div>
+
+            <div class="status-item">
+                ❤️ Saúde da Planta: <span id="txt-saude">100</span>%
+                <div class="barra"><div id="saude-barra" class="progresso" style="width: 100%;"></div></div>
+            </div>
+
+            <div class="status-item">
+                🌱 Índice de Sustentabilidade: <span id="txt-sustentavel">100</span>%
+                <div class="barra"><div id="sustentavel-barra" class="progresso" style="width: 100%;"></div></div>
+            </div>
+
+            <hr>
+            <p>💰 Pontos de Produção: <strong id="txt-pontos">0</strong></p>
+            <div class="log-mensagens" id="log">Jogo iniciado! Cuide da sua plantação.</div>
+        </div>
+
+        <div class="painel">
+            <h2>Manejo e Campo</h2>
+            
+            <div class="visual-planta">
+                <div id="icone-planta">🌱</div>
+                <div id="alerta-praga"></div>
+            </div>
+
+            <div class="controles">
+                <button class="btn-agua" onclick="regar()">💧 Irrigar Solo</button>
+                <button class="btn-bio" onclick="controleBiologico()">🐞 Controle Biológico</button>
+                <button class="btn-quimico" onclick="controleQuimico()">🧪 Defensivo Químico</button>
+                <button class="btn-colher" id="btn-colheita" onclick="colher()" disabled>🧺 Realizar Colheita</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Variáveis de Estado do Jogo
+        let umidade = 50;
+        let saude = 100;
+        let sustentabilidade = 100;
+        let pontos = 0;
+        let temPraga = false;
+        let tempoParaColheita = 0;
+
+        // Elementos da Tela para o JS atualizar
+        const txtAgua = document.getElementById('txt-agua');
+        const txtSaude = document.getElementById('txt-saude');
+        const txtSustentavel = document.getElementById('txt-sustentavel');
+        const txtPontos = document.getElementById('txt-pontos');
+        const alertaPraga = document.getElementById('alerta-praga');
+        const iconePlanta = document.getElementById('icone-planta');
+        const btnColheita = document.getElementById('btn-colheita');
+        const log = document.getElementById('log');
+
+        const barraAgua = document.getElementById('agua-barra');
+        const barraSaude = document.getElementById('saude-barra');
+        const barraSustentavel = document.getElementById('sustentavel-barra');
+
+        // Loop Principal do Jogo (Roda a cada 3 segundos)
+        setInterval(() => {
+            // A umidade cai com o tempo
+            umidade = Math.max(0, umidade - 8);
+            
+            // Chance aleatória de aparecer lagartas (25% de chance a cada ciclo)
+            if (!temPraga && Math.random() < 0.25 && tempoParaColheita < 5) {
+                temPraga = true;
+                adicionarLog("⚠️ ALERTA: Lagartas atacando a plantação!");
+            }
+
+            // Consequências das pragas
+            if (temPraga) {
+                saude = Math.max(0, saude - 12);
+            }
+
+            // Consequências da falta ou excesso de água
+            if (umidade < 20 || umidade > 80) {
+                saude = Math.max(0, saude - 8);
+                adicionarLog("⚠️ A umidade está inadequada! A saúde da planta está caindo.");
+            }
+
+            // Evolução do crescimento da planta baseado na saúde
+            if (saude > 50 && tempoParaColheita < 5) {
+                tempoParaColheita++;
+                mudarEstagioPlanta();
+            }
+
+            // Se a saúde chegar a zero, a planta morre
+            if (saude <= 0) {
+                iconePlanta.innerText = "🥀";
+                adicionarLog("❌ A planta morreu. Recarregue a página para tentar de novo.");
+                desativarBotoes();
+            }
+
+            atualizarTela();
+        }, 3000);
+
+        // Ações do Jogador
+        function regar() {
+            umidade = Math.min(100, umidade + 25);
+            adicionarLog("💧 Você irrigou a lavoura.");
+            atualizarTela();
+        }
+
+        function controleBiologico() {
+            if (temPraga) {
+                temPraga = false;
+                sustentabilidade = Math.min(100, sustentabilidade + 5); // Ganha bônus verde
+                adicionarLog("🐞 Joanninhas soltas! Controle biológico feito com sucesso e equilíbrio.");
+            } else {
+                adicionarLog("Não há pragas para combater no momento.");
+            }
+            atualizarTela();
+        }
+
+        function controleQuimico() {
+            if (temPraga) {
+                temPraga = false;
+                sustentabilidade = Math.max(0, sustentabilidade - 25); // Perde muitos pontos ambientais
+                adicionarLog("🧪 Defensivo químico aplicado. Pragas eliminadas, mas afetou o meio ambiente.");
+            } else {
+                adicionarLog("Não há pragas para combater no momento.");
+            }
+            atualizarTela();
+        }
+
+        function colher() {
+            // Pontuação final baseada no equilíbrio entre saúde e meio ambiente
+            let pontosGanhos = Math.round((saude + sustentabilidade) * 5);
+            pontos += pontosGanhos;
+            adicionarLog(`🎉 Colheita realizada com sucesso! Você ganhou ${pontosGanhos} pontos.`);
+            
+            // Reseta para a próxima plantação
+            tempoParaColheita = 0;
+            saude = 100;
+            umidade = 50;
+            iconePlanta.innerText = "🌱";
+            btnColheita.disabled = true;
+            atualizarTela();
+        }
+
+        // Funções de Suporte
+        function atualizarTela() {
+            txtAgua.innerText = umidade;
+            txtSaude.innerText = saude;
+            txtSustentavel.innerText = sustentabilidade;
+            txtPontos.innerText = pontos;
+
+            barraAgua.style.width = umidade + "%";
+            barraSaude.style.width = saude + "%";
+            barraSustentavel.style.width = sustentabilidade + "%";
+
+            if (temPraga) {
+                alertaPraga.innerText = "🐛 PRAGA DETECTADA (Lagartas)";
+            } else {
+                alertaPraga.innerText = "";
+            }
+
+            if (tempoParaColheita >= 5 && saude > 0) {
+                btnColheita.disabled = false;
+                adicionarLog("✨ A planta está pronta para a colheita!");
+            }
+        }
+
+        function mudarEstagioPlanta() {
+            if (tempoParaColheita == 1) iconePlanta.innerText = "🌱";
+            if (tempoParaColheita == 3) iconePlanta.innerText = "🌿";
+            if (tempoParaColheita == 5) iconePlanta.innerText = "🌳";
+        }
+
+        function adicionarLog(texto) {
+            log.innerHTML = texto + "<br>" + log.innerHTML;
+        }
+
+        function desativarBotoes() {
+            document.querySelectorAll('button').forEach(b => b.disabled = true);
+        }
+    </script>
+</body>
+</html>
