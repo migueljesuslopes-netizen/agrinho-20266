@@ -1,0 +1,146 @@
+/* ==========================================
+   ESTILIZAÇÃO GERAL E LAYOUT
+   ========================================== */
+body {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    background-color: #eef5ed; /* Tom de verde bem claro para o fundo */
+    color: #333;
+    margin: 0;
+    padding: 20px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+header {
+    text-align: center;
+    margin-bottom: 20px;
+}
+
+h1 { 
+    color: #2e7d32; /* Verde escuro (Agro) */
+    margin-bottom: 5px; 
+}
+
+h3 { 
+    color: #558b2f; 
+    margin-top: 0; 
+    font-weight: 500;
+}
+
+/* Container que segura os dois painéis lado a lado */
+.container {
+    display: flex;
+    gap: 20px;
+    max-width: 900px;
+    width: 100%;
+}
+
+/* Cada um dos cartões brancos (Status e Manejo) */
+.painel {
+    background: white;
+    padding: 20px;
+    border-radius: 12px;
+    box-shadow: 0 4px 6px rgba(0,0,0,0.1); /* Sombra suave para dar foco */
+    flex: 1;
+}
+
+/* ==========================================
+   BARRAS DE PROGRESSO (STATUS)
+   ========================================== */
+.status-item {
+    margin-bottom: 15px;
+    font-size: 1.1em;
+    font-weight: 500;
+}
+
+.barra {
+    background-color: #ddd;
+    border-radius: 8px;
+    height: 20px;
+    width: 100%;
+    overflow: hidden;
+    margin-top: 5px;
+}
+
+/* Animação para a barra crescer/diminuir suavemente */
+.progresso {
+    height: 100%;
+    width: 50%;
+    transition: width 0.5s ease, background-color 0.5s ease;
+}
+
+#agua-barra { background-color: #2196F3; }       /* Azul */
+#saude-barra { background-color: #4CAF50; }       /* Verde */
+#sustentavel-barra { background-color: #8bc34a; } /* Verde Claro */
+
+/* ==========================================
+   ÁREA DA PLANTA E ALERTAS
+   ========================================== */
+.visual-planta {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    min-height: 250px;
+    border: 2px dashed #a5d6a7;
+    border-radius: 12px;
+    background-color: #f9fbf9;
+    margin-bottom: 20px;
+}
+
+#icone-planta { 
+    font-size: 80px; 
+    transition: transform 0.3s ease; 
+}
+
+#alerta-praga { 
+    color: #d32f2f; 
+    font-weight: bold; 
+    margin-top: 10px; 
+    min-height: 20px;
+    animation: piscar 1s infinite alternate; /* Alerta piscando */
+}
+
+@keyframes piscar {
+    from { opacity: 1; }
+    to { opacity: 0.5; }
+}
+
+/* ==========================================
+   BOTÕES E CONTROLES
+   ========================================== */
+.controles {
+    display: grid;
+    grid-template-columns: 1fr 1fr; /* Divide os botões em duas colunas */
+    gap: 10px;
+}
+
+button {
+    padding: 12px;
+    border: none;
+    border-radius: 8px;
+    font-size: 1em;
+    cursor: pointer;
+    font-weight: bold;
+    transition: transform 0.1s, opacity 0.2s;
+}
+
+button:active { 
+    transform: scale(0.98); /* Efeito de clique */
+}
+
+.btn-agua { background-color: #2196F3; color: white; }
+.btn-bio { background-color: #4CAF50; color: white; }
+.btn-quimico { background-color: #ff9800; color: white; }
+
+/* Botão de colheita ocupa as duas colunas */
+.btn-colher { 
+    background-color: #9c27b0; 
+    color: white; 
+    grid-column: span 2; 
+}
+
+/* Aparência de botão desativado */
+button:disabled { 
+    background-color: #
